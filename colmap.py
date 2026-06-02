@@ -28,7 +28,7 @@ Unbounded scenes
 MipNeRF360 scenes are unbounded. This module does **not** implement scene contraction;
 instead the renderer concentrates samples inside an axis-aligned box derived from the
 sparse point cloud (see ``compute_aabb``), using per-ray box intersection for near/far.
-The central, reconstructed region trains well; far background is only approximate.
+The central, reconstructed region trains well; far background is only approximate. 
 """
 
 from __future__ import annotations

@@ -15,7 +15,7 @@ conda activate instant_ngp_sh
     cd $HOME/instantNGP-SH
     SCENE="bicycle"
 
-    python -m instant_ngp_sh.train \
+    python train.py \
         --data $HOME/mipnerf/$SCENE \
         --out out/$SCENE \
         --sh_degree 3 \
