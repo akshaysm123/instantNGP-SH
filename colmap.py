@@ -256,7 +256,7 @@ class ColmapDataset:
         split: str = "train",
         downscale: float = 1.0,
         images_dir: str = "images",
-        holdout: int = 8,
+        holdout: int = 0,
         white_background: bool = False,
         near: Optional[float] = None,
         far: Optional[float] = None,
@@ -266,11 +266,11 @@ class ColmapDataset:
 
         Args:
             root: scene directory containing ``images/`` and ``sparse/``.
-            split: ``"train"``, ``"test"`` (or ``"all"``). Test is every ``holdout``-th
-                image (MipNeRF360 / 3DGS convention); train is the rest.
+            split: ``"train"``, ``"test"`` (or ``"all"``). With ``holdout > 0``, test is
+                every ``holdout``-th image (MipNeRF360 / 3DGS convention) and train is the rest.
             downscale: resize images by this factor (intrinsics are scaled to match).
             images_dir: image subfolder (e.g. ``"images_4"`` for the 4x downsampled set).
-            holdout: hold out every N-th image for the test split (0 = use all for train).
+            holdout: hold out every N-th image for the test split (default 0 = no holdout).
             white_background: composite color for empty space (default black).
             near, far: ray bounds; if ``None`` they are auto-estimated from the scene.
             max_images: optionally cap the number of images.

@@ -43,7 +43,8 @@ def parse_args():
     p.add_argument("--split", default="test", choices=["train", "test"])
     p.add_argument("--downscale", type=float, default=2.0)
     p.add_argument("--images_dir", default="images", help="image subfolder")
-    p.add_argument("--holdout", type=int, default=8, help="eval holdout stride")
+    p.add_argument("--holdout", type=int, default=0,
+                   help="eval holdout stride (0=all images; use 8 with --split test for MipNeRF360)")
     p.add_argument("--n_samples", type=int, default=256)
     p.add_argument("--max_images", type=int, default=None)
     p.add_argument("--device", default="cuda")

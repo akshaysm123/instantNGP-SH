@@ -91,14 +91,14 @@ scene/
 
 ```bash
 python -m instant_ngp_sh.train --data /path/to/garden --out runs/garden \
-    --images_dir images_4 --downscale 1 --holdout 8 --sh_degree 3
+    --images_dir images_4 --downscale 1 --sh_degree 3
 ```
 
 Notes:
 - The field trains in the **COLMAP world frame**, so it lines up with a splatting model
   trained on the *same* COLMAP (see `notes/implementation_notes.md` §9).
-- Every `--holdout`-th image (default 8, the MipNeRF360 convention) is held out as the
-  `test` split; the rest are `train`.
+- By default all images are used for training. Pass `--holdout 8` to hold out every 8th
+  image as the `test` split (MipNeRF360 / 3DGS convention); the rest are `train`.
 - The scene **AABB is derived from the sparse point cloud**, and the renderer uses per-ray
   AABB intersection to place samples. `--near`/`--far` are auto-estimated if omitted.
 - There is **no scene contraction**: the central reconstructed region trains well, but far

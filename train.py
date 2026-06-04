@@ -55,8 +55,8 @@ def parse_args():
     p.add_argument("--downscale", type=float, default=2.0, help="image downscale factor")
     p.add_argument("--images_dir", default="images",
                    help="image subfolder, e.g. images_4 for the 4x downsampled set")
-    p.add_argument("--holdout", type=int, default=8,
-                   help="hold out every N-th image for eval (MipNeRF360 convention)")
+    p.add_argument("--holdout", type=int, default=0,
+                   help="hold out every N-th image for eval (0=all train; 8=MipNeRF360)")
     p.add_argument("--white_bg", action="store_true", default=False,
                    help="composite empty space onto white (default black)")
     p.add_argument("--near", type=float, default=None,
