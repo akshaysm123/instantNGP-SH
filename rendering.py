@@ -186,7 +186,7 @@ def render_image(
     n_samples: int,
     sh_degree: int,
     bg_color: Optional[torch.Tensor] = None,
-    chunk: int = 1 << 15,
+    chunk: int = 1 << 13,   # tested on 40 GiB A100
     aabb: Optional[torch.Tensor] = None,
 ) -> Dict[str, torch.Tensor]:
     """Render a full image worth of rays in chunks (no gradients).

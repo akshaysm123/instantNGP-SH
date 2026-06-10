@@ -2,22 +2,25 @@
 
 #SBATCH --partition=gpu_a100
 #SBATCH --gpus=1
-#SBATCH --job-name=iNGP-SH_env
+#SBATCH --job-name=ngpSH-train
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=18
 #SBATCH --time=01:00:00
-#SBATCH --output=output/iNGP-%A.out
+#SBATCH --output=output/ngp-%A.out
 
 source $HOME/miniconda3/start1260.sh
 conda activate instant_ngp_sh
+export PYTHONUNBUFFERED=1
 
 (
-    cd $HOME/instantNGP-SH
+    cd $HOME
     SCENE="bicycle"
 
-    python train.py \
+    python -u -m instant_ngp_sh.train \
         --data $HOME/mipnerf/$SCENE \
-        --out out/$SCENE \
+        --out $HOME/instant_ngp_sh/out/$SCENE \
+        --images_dir image_4 \
+        --downscale 1 \
         --sh_degree 3 \
         --near 0.2 \
         --far 100.0 \
