@@ -140,14 +140,6 @@ def sh_to_rgb(
     return rgb
 
 
-def rgb_to_sh(rgb: torch.Tensor) -> torch.Tensor:
-    """Inverse of the DC (constant) SH term: ``(rgb - 0.5) / C0``.
-
-    Useful for initializing the DC coefficient of an SH field from a base color.
-    """
-    return (rgb - 0.5) / C0
-
-
 def SH2RGB(sh: torch.Tensor) -> torch.Tensor:
     """DC-only SH coefficient -> RGB (``sh * C0 + 0.5``)."""
     return sh * C0 + 0.5

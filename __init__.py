@@ -24,7 +24,6 @@ from .sh import (
     SH2RGB,
     eval_sh,
     num_sh_coeffs,
-    rgb_to_sh,
     sh_to_rgb,
 )
 from .rendering import (
@@ -41,7 +40,6 @@ __all__ = [
     "trunc_exp",
     "eval_sh",
     "sh_to_rgb",
-    "rgb_to_sh",
     "SH2RGB",
     "RGB2SH",
     "num_sh_coeffs",

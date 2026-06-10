@@ -35,6 +35,8 @@ class _TruncExp(torch.autograd.Function):
     Used as the density activation: the forward pass is a plain ``exp`` (clamped to
     avoid ``inf``), while the backward pass clamps the exponent to ``[-15, 15]`` so a
     large/empty-space density does not produce an exploding gradient.
+
+    https://github.com/ashawkey/torch-ngp/blob/main/activation.py
     """
 
     @staticmethod
@@ -158,7 +160,10 @@ class InstantNGPSHField(nn.Module):
     # -- public API -----------------------------------------------------------
 
     def normalize_positions(self, positions: torch.Tensor) -> torch.Tensor:
-        """Map world-space ``positions`` (``[..., 3]``) into ``[0, 1]^3`` via the AABB."""
+        """
+        Map world-space ``positions`` into ``[0, 1]^3`` via the AABB. Query points
+        outside the AABB are clamped to the box surface.
+        """
         aabb_min = self.aabb[:3]
         aabb_max = self.aabb[3:]
         normalized = (positions - aabb_min) / (aabb_max - aabb_min)

@@ -134,7 +134,9 @@ def volume_render_rays(
 
     if aabb is not None:
         t_min, t_max, hit = ray_aabb_intersect(rays_o, rays_d, aabb)
+        # minimum aabb intersection clamped to global near plane, or global near plane if no intersection
         ray_near = torch.where(hit, t_min.clamp(min=near), torch.full_like(t_min, near))
+        # maximum aabb intersection or global far plane if no intersection
         ray_far = torch.where(hit, t_max, torch.full_like(t_max, far))
         ray_far = torch.maximum(ray_far, ray_near + 1e-4)
         pts, t_vals = sample_along_rays(rays_o, rays_d, ray_near, ray_far, n_samples, perturb)
@@ -156,6 +158,7 @@ def volume_render_rays(
     dists = torch.cat([dists, last], dim=-1)  # [N, S]
     dists = dists * torch.norm(rays_d[:, None, :], dim=-1)
 
+    # rendering equation
     alpha = 1.0 - torch.exp(-density * dists)  # [N, S]
     transmittance = torch.cumprod(
         torch.cat([torch.ones_like(alpha[:, :1]), 1.0 - alpha + 1e-10], dim=-1), dim=-1

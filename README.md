@@ -20,7 +20,7 @@ position (x,y,z) ──► hash grid ──► MLP ──► SH coefficients ─
 | File | Purpose |
 |------|---------|
 | `model.py` | `InstantNGPSHField` — the hash grid + MLP. Output is SH coefficients (+ an optional density head). |
-| `sh.py` | `sh_to_rgb`, `eval_sh`, `rgb_to_sh`, `SH2RGB`/`RGB2SH` — SH ↔ RGB conversions. |
+| `sh.py` | `sh_to_rgb`, `eval_sh`, `SH2RGB`/`RGB2SH` — SH ↔ RGB conversions. |
 | `rendering.py` | `volume_render_rays` / `render_image` — minimal NeRF volume renderer with ray–AABB sampling. |
 | `colmap.py` | `ColmapDataset` — reads a COLMAP model (`cameras/images/points3D.bin`, MipNeRF360 / 3DGS layout) + ray generation. |
 | `train.py` | training entry point. |
