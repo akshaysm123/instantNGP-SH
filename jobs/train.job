@@ -19,6 +19,7 @@ export PYTHONUNBUFFERED=1
     python -u -m instant_ngp_sh.train \
         --data $HOME/mipnerf/$SCENE \
         --out $HOME/instant_ngp_sh/out/$SCENE \
+        --images_dir images_4 \
         --downscale 1 \
         --sh_degree 3 \
         --near 0.2 \

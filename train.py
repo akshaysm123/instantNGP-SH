@@ -81,7 +81,11 @@ def parse_args():
     p.add_argument("--seed", type=int, default=0)
     # Logging / eval.
     p.add_argument("--eval_every", type=int, default=2000)
+    p.add_argument("--eval_chunk", type=int, default=1 << 13,
+                   help="rays per chunk during eval rendering (lower if eval OOMs)")
     p.add_argument("--log_every", type=int, default=100)
+    p.add_argument("--images_on_gpu", action="store_true",
+                   help="store all training images on GPU (default: keep on CPU)")
     p.add_argument("--device", default="cuda")
     return p.parse_args()
 
@@ -103,6 +107,8 @@ def build_field(args, aabb) -> InstantNGPSHField:
 @torch.no_grad()
 def evaluate(field, dataset, args, device, out_dir, step, render_aabb=None, max_views=3):
     field.eval()
+    if device.startswith("cuda"):
+        torch.cuda.empty_cache()
     psnrs = []
     n = min(max_views, dataset.num_images())
     for idx in range(n):
@@ -116,14 +122,18 @@ def evaluate(field, dataset, args, device, out_dir, step, render_aabb=None, max_
             n_samples=args.n_samples,
             sh_degree=args.sh_degree,
             bg_color=dataset.bg_color.to(device) if dataset.bg_color is not None else None,
+            chunk=args.eval_chunk,
             aabb=render_aabb,
         )
-        gt = dataset.images[idx].to(device)
-        mse = torch.mean((out["rgb"] - gt) ** 2).item()
+        gt = dataset.images[idx]
+        mse = torch.mean((out["rgb"].cpu() - gt) ** 2).item()
         psnrs.append(mse_to_psnr(mse))
 
         rgb = (out["rgb"].clamp(0, 1).cpu().numpy() * 255).astype("uint8")
         imageio.imwrite(os.path.join(out_dir, f"eval_step{step:06d}_view{idx}.png"), rgb)
+        del out
+        if device.startswith("cuda"):
+            torch.cuda.empty_cache()
     field.train()
     return sum(psnrs) / len(psnrs)
 
@@ -150,8 +160,9 @@ def main():
         far=args.far,
         images_dir=args.images_dir,
         holdout=args.holdout,
-    ).to(device)
-    print(f"  {train_set.num_images()} images at {train_set.H}x{train_set.W}, "
+    ).to(device, images_on_device=args.images_on_gpu)
+    img_device = "GPU" if train_set.images.device.type == device.split(":")[0] else "CPU"
+    print(f"  {train_set.num_images()} images at {train_set.H}x{train_set.W} ({img_device}), "
           f"focal={train_set.focal:.2f}, near={train_set.near:.4f}, far={train_set.far:.4f}")
 
     aabb = train_set.compute_aabb(padding=0.1).to(device)

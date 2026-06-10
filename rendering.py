@@ -198,13 +198,18 @@ def render_image(
     spatial = rays_o.shape[:-1]
     rays_o = rays_o.reshape(-1, 3)
     rays_d = rays_d.reshape(-1, 3)
+    n_rays = rays_o.shape[0]
 
-    chunks = []
-    for i in range(0, rays_o.shape[0], chunk):
+    rgb_out = torch.empty(n_rays, 3, device=rays_o.device, dtype=torch.float32)
+    depth_out = torch.empty(n_rays, device=rays_o.device, dtype=torch.float32)
+    acc_out = torch.empty(n_rays, device=rays_o.device, dtype=torch.float32)
+
+    for i in range(0, n_rays, chunk):
+        end = min(i + chunk, n_rays)
         out = volume_render_rays(
             field,
-            rays_o[i : i + chunk],
-            rays_d[i : i + chunk],
+            rays_o[i:end],
+            rays_d[i:end],
             near=near,
             far=far,
             n_samples=n_samples,
@@ -213,11 +218,12 @@ def render_image(
             perturb=False,
             aabb=aabb,
         )
-        chunks.append(out)
+        rgb_out[i:end] = out["rgb"]
+        depth_out[i:end] = out["depth"]
+        acc_out[i:end] = out["acc"]
 
-    merged = {
-        "rgb": torch.cat([c["rgb"] for c in chunks], dim=0).reshape(*spatial, 3),
-        "depth": torch.cat([c["depth"] for c in chunks], dim=0).reshape(*spatial),
-        "acc": torch.cat([c["acc"] for c in chunks], dim=0).reshape(*spatial),
+    return {
+        "rgb": rgb_out.reshape(*spatial, 3),
+        "depth": depth_out.reshape(*spatial),
+        "acc": acc_out.reshape(*spatial),
     }
-    return merged

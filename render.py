@@ -78,7 +78,7 @@ def main():
         far=far,
         images_dir=args.images_dir,
         holdout=args.holdout,
-    ).to(device)
+    ).to(device, images_on_device=False)
 
     # Scene-box sampling, matching training.
     render_aabb = field.aabb
@@ -100,8 +100,8 @@ def main():
             bg_color=dataset.bg_color.to(device) if dataset.bg_color is not None else None,
             aabb=render_aabb,
         )
-        gt = dataset.images[idx].to(device)
-        mse = torch.mean((out["rgb"] - gt) ** 2).item()
+        gt = dataset.images[idx]
+        mse = torch.mean((out["rgb"].cpu() - gt) ** 2).item()
         psnr = mse_to_psnr(mse)
         psnrs.append(psnr)
 

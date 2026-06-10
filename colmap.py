@@ -359,8 +359,11 @@ class ColmapDataset:
     def num_images(self) -> int:
         return self.images.shape[0]
 
-    def to(self, device) -> "ColmapDataset":
-        self.images = self.images.to(device)
+    def to(self, device, *, images_on_device: bool = True) -> "ColmapDataset":
+        """Move tensors to ``device``. Keep ``images`` on CPU when ``images_on_device=False``
+        to avoid storing the full image stack on the GPU (large scenes can exceed VRAM)."""
+        if images_on_device:
+            self.images = self.images.to(device)
         self.c2w = self.c2w.to(device)
         self.fx = self.fx.to(device); self.fy = self.fy.to(device)
         self.cx = self.cx.to(device); self.cy = self.cy.to(device)
@@ -370,14 +373,21 @@ class ColmapDataset:
             self.point_xyz = self.point_xyz.to(device)
         return self
 
+    @property
+    def device(self) -> torch.device:
+        return self.c2w.device
+
     def sample_rays(self, batch_size, generator=None):
-        device = self.images.device
+        device = self.device
         n = self.num_images()
         # sample random pixels in random images
         img_idx = torch.randint(0, n, (batch_size,), generator=generator, device=device)
         y = torch.randint(0, self.H, (batch_size,), generator=generator, device=device)
         x = torch.randint(0, self.W, (batch_size,), generator=generator, device=device)
-        rgb = self.images[img_idx, y, x]
+        if self.images.device == device:
+            rgb = self.images[img_idx, y, x]
+        else:
+            rgb = self.images[img_idx.cpu(), y.cpu(), x.cpu()].to(device)
 
         dirs = torch.stack(
             [
