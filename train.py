@@ -74,14 +74,14 @@ def parse_args():
     p.add_argument("--mlp_hidden_layers", type=int, default=2)
     # Optimization.
     p.add_argument("--iters", type=int, default=20000)
-    p.add_argument("--batch", type=int, default=4096, help="rays per iteration")
+    p.add_argument("--batch", type=int, default=8192, help="rays per iteration")
     p.add_argument("--n_samples", type=int, default=256, help="samples per ray")
     p.add_argument("--lr", type=float, default=1e-2)
     p.add_argument("--lr_final", type=float, default=1e-4)
     p.add_argument("--seed", type=int, default=0)
     # Logging / eval.
     p.add_argument("--eval_every", type=int, default=2000)
-    p.add_argument("--eval_chunk", type=int, default=1 << 13,
+    p.add_argument("--eval_chunk", type=int, default=1 << 15,
                    help="rays per chunk during eval rendering (lower if eval OOMs)")
     p.add_argument("--log_every", type=int, default=100)
     p.add_argument("--images_on_gpu", action="store_true",
